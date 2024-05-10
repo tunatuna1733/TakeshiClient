@@ -1,0 +1,45 @@
+name: release
+
+on:
+    push: 
+        branches: 
+            - 'master'
+        paths: 
+            - 'metadata.json'
+    workflow_dispatch: {}
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        permissions: 
+            contents: write
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set version to GITHUB_ENV
+              run: |
+                version=$(cat ./metadata.json | jq -r .version)
+                echo "VERSION=${version}" >> $GITHUB_ENV
+
+            - name: Make TakeshiClient directory and copy files
+              run: |
+                rsync -ahv . ./TakeshiClient --exclude '.git' --exclude '.github' --exclude '.gitignore' --exclude 'changelog.json'
+
+            - name: Create zip file for release
+              run: |
+                zip -r TakeshiClient ./TakeshiClient/
+
+            - name: Create changelog markdown file
+              run: |
+                cat ./changelog.json | jq -r '."${{env.VERSION}}"[]' > changelog.md
+
+            - name: Create release
+              uses: softprops/action-gh-release@v1
+              with:
+                tag_name: ${{env.VERSION}}
+                name: ${{env.VERSION}}
+                body_path: ./changelog.md
+                draft: false
+                prerelease: false
+                files: TakeshiClient.zip
