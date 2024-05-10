@@ -3,7 +3,7 @@
     "description": "/tc for settings",
     "creator": "tunatuna1733",
     "entry": "index.js",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "requires": [
         "PogData",
         "Vigilance",
@@ -12,7 +12,6 @@
         "BeaconBeam",
         "numeraljs",
         "RenderLib",
-        "ServerUtilities",
-        "PromiseV2"
+        "ServerUtilities"
     ]
 }
